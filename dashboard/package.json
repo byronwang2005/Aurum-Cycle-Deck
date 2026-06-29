@@ -1,0 +1,30 @@
+{
+  "name": "precious-metals-viewpoints",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build:data": "node scripts/build-data.mjs",
+    "dev": "npm run build:data && vite --host 127.0.0.1",
+    "build": "npm run build:data && tsc --noEmit && vite build",
+    "preview": "vite preview --host 127.0.0.1"
+  },
+  "dependencies": {
+    "@phosphor-icons/react": "^2.1.10",
+    "@vitejs/plugin-react": "^5.0.1",
+    "csv-parse": "^5.6.0",
+    "echarts": "^5.6.0",
+    "echarts-for-react": "^3.0.2",
+    "gsap": "^3.13.0",
+    "motion": "^12.23.12",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "vite": "^7.1.3"
+  },
+  "devDependencies": {
+    "@types/node": "^24.3.0",
+    "@types/react": "^19.1.10",
+    "@types/react-dom": "^19.1.7",
+    "typescript": "^5.9.2"
+  }
+}
