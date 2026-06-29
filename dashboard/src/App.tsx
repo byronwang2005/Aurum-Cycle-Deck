@@ -671,14 +671,9 @@ function App() {
           {page === 6 && (
             <div className="slideStack">
               <SlideHeader title="大回撤预警" subtitle="把宏观、资金、波动和技术信号合成 0-100 分风险评分，而不是等回撤后找理由。" />
-              <div className="twoColumn">
-                <ChartBox title="样本内拥挤风险提示" icon={<Gauge size={20} weight="duotone" />}>
-                  <ReactECharts option={riskGaugeOption(sampleDrawdownRisk)} style={{ height: 440 }} />
-                </ChartBox>
-                <ChartBox title="风险权重拆解" icon={<ChartBar size={20} weight="duotone" />}>
-                  <ReactECharts option={barOption(p.riskScoreWeights.map((i) => ({ name: i.signal, value: i.weight })))} style={{ height: 440 }} />
-                </ChartBox>
-              </div>
+              <ChartBox title="风险权重拆解" icon={<ChartBar size={20} weight="duotone" />}>
+                <ReactECharts option={barOption(p.riskScoreWeights.map((i) => ({ name: i.signal, value: i.weight })))} style={{ height: 440 }} />
+              </ChartBox>
               <div className="signalBands">
                 {["领先信号", "同步信号", "滞后/情绪信号", "确认信号"].map((layer) => (
                   <article key={layer}>
@@ -696,6 +691,9 @@ function App() {
           {page === 7 && (
             <div className="slideStack">
               <SlideHeader title="样本阶段推断" subtitle="仅基于截至 2026-03-03 的本地研报样本，不代表 2026-06-29 实时市场状态。" />
+              <ChartBox title="样本内拥挤风险提示" icon={<Gauge size={20} weight="duotone" />}>
+                <ReactECharts option={riskGaugeOption(sampleDrawdownRisk)} style={{ height: 360 }} />
+              </ChartBox>
               <div className="stageGrid">
                 {p.currentStageSignals.map((signal) => (
                   <article key={signal.name}>
