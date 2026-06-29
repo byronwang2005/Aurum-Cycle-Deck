@@ -11,6 +11,7 @@ const csvPath = path.join(outDir, "report_viewpoint_database.csv");
 const evidencePath = path.join(outDir, "evidence_index.jsonl");
 const coveragePath = path.join(outDir, "source_coverage.md");
 const reportPath = path.join(outDir, "precious_metals_report.md");
+const currentMarketPath = path.join(outDir, "current_market_snapshot.json");
 
 const splitList = (value) =>
   String(value || "")
@@ -29,6 +30,11 @@ const splitSnippets = (value) =>
     .map((text) => text.trim())
     .filter(Boolean)
     .slice(0, 3);
+
+const readJsonIfExists = (filePath, fallback) => {
+  if (!fs.existsSync(filePath)) return fallback;
+  return JSON.parse(fs.readFileSync(filePath, "utf8"));
+};
 
 const countBy = (rows, getter) => {
   const map = new Map();
@@ -120,6 +126,14 @@ const topics = countBy(evidence, (row) => row.topic);
 
 const coverage = fs.readFileSync(coveragePath, "utf8");
 const reportMarkdown = fs.readFileSync(reportPath, "utf8");
+const currentMarket = readJsonIfExists(currentMarketPath, {
+  analysisDate: "2026-06-29",
+  latestDataDate: "2026-06-26",
+  stageCallout: "当前市场快照缺失。",
+  riskScore: 70,
+  signals: [],
+  sources: []
+});
 const reportSections = parseMarkdownSections(reportMarkdown);
 const latestDate = reports.reduce((latest, row) => (row.date > latest ? row.date : latest), "");
 const totalPages = reports.reduce((sum, row) => sum + row.pageCount, 0);
@@ -130,7 +144,7 @@ const narrative = {
   thesis:
     "黄金不是单一利率交易。短期仍由实际利率、美元和 Fed 预期牵引，中长期中枢被央行购金、美元信用、财政约束和地缘风险重估。",
   boundary:
-    "仅使用本地研报库和已生成观点索引，不包含实时行情、外部网页或 2026-03-03 之后的新资料。",
+    `本地研报库用于框架和历史复盘；当前阶段使用 mx skills 与官方可信网页交叉，判断截至 ${currentMarket.analysisDate}，数据最新可得日至 ${currentMarket.latestDataDate}。`,
   conclusions: [
     {
       metal: "黄金",
@@ -215,9 +229,9 @@ const onePageConclusions = [
     proof: "历史大调整往往是宏观变量反向、资金拥挤、技术破位同时出现。"
   },
   {
-    question: "样本内阶段推断？",
-    answer: "仅按截至 2026-03-03 的本地研报样本，更像降息预期交易期 + 高利率维持后段 + 牛市中段，同时存在拥挤回撤风险。",
-    proof: "这不是 2026-06-29 实时判断；缺少今天的 Fed 定价、DXY、实际利率、ETF/CFTC 和行情数据。"
+    question: "当前阶段？",
+    answer: currentMarket.stageCallout,
+    proof: `截至 ${currentMarket.analysisDate}，结合 Fed、FRED、mx宏观、CFTC、ETF和6月最新贵金属研报。`
   }
 ];
 
@@ -386,12 +400,44 @@ const riskScoreWeights = [
   { signal: "技术破位", weight: 5, layer: "确认信号" }
 ];
 
-const currentStageSignals = [
-  { name: "降息预期交易", strength: 82, evidence: "多篇 2025-2026 年研报仍讨论降息、实际利率下行和黄金配置。" },
-  { name: "高利率维持后段", strength: 68, evidence: "市场仍在处理 higher for longer 与终端利率预期修正。" },
-  { name: "牛市中段", strength: 76, evidence: "央行购金、美元信用、财政债务和地缘风险仍支撑中长期逻辑。" },
-  { name: "样本内拥挤风险", strength: 70, evidence: "2025 年 10 月后报告开始讨论金银大跌、波动率和配置性价比下降；不代表今天实时风险。" }
+const currentStageSignals = currentMarket.signals?.length
+  ? currentMarket.signals.map((item) => ({
+      name: item.name,
+      strength: item.strength,
+      evidence: item.evidence
+    }))
+  : [
+      { name: "当前风险", strength: currentMarket.riskScore ?? 70, evidence: currentMarket.stageCallout }
+    ];
+
+const currentIndicators = (currentMarket.indicators || []).map((item) => ({
+  name: item.name,
+  value: item.value,
+  date: item.date,
+  source: item.source,
+  implication: item.goldImplication,
+  riskImpact: item.riskImpact
+}));
+
+const priorityIndicatorNames = [
+  "Fed政策利率",
+  "美国10Y TIPS实际利率",
+  "伦敦现货黄金",
+  "伦敦现货白银",
+  "GLD/SPDR黄金ETF持仓",
+  "CFTC COMEX黄金非商业净多"
 ];
+
+const currentHeadlineIndicators = priorityIndicatorNames
+  .map((name) => currentIndicators.find((item) => item.name === name))
+  .filter(Boolean);
+
+const currentMarketSources = (currentMarket.sources || []).map((item) => ({
+  institution: item.name,
+  date: currentMarket.analysisDate,
+  title: item.note || item.url,
+  snippets: [{ page: "-", text: item.url }]
+}));
 
 const strategyCards = [
   {
@@ -429,6 +475,8 @@ const coverageStats = {
     pages: totalPages,
     chars: totalChars,
     latestDate,
+    currentAnalysisDate: currentMarket.analysisDate,
+    currentLatestDataDate: currentMarket.latestDataDate,
     coreShare: coreCount / reports.length
   }
 };
@@ -441,6 +489,8 @@ const presentation = {
   historicalCrashes,
   riskScoreWeights,
   currentStageSignals,
+  currentIndicators,
+  currentHeadlineIndicators,
   strategyCards,
   coverageStats,
   sourcesByPage: {
@@ -450,7 +500,7 @@ const presentation = {
     cut: sourceForTopic("降息周期", 5),
     crash: sourceForTopic("历史大调整", 5),
     risk: sourceForTopic("风险预警", 5),
-    stage: sourceForTopic("当前阶段", 5)
+    stage: currentMarketSources.length ? currentMarketSources : sourceForTopic("当前阶段", 5)
   }
 };
 
@@ -465,7 +515,9 @@ fs.writeFileSync(
         totalChars,
         coreCount,
         coreShare: coreCount / reports.length,
-        latestDate
+        latestDate: currentMarket.analysisDate,
+        currentLatestDataDate: currentMarket.latestDataDate,
+        localLatestDate: latestDate
       },
       narrative,
       presentation,

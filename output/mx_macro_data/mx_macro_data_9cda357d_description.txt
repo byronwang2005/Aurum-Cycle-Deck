@@ -1,0 +1,31 @@
+宏观数据查询结果说明
+========================================
+查询内容: 查询美国10年期国债收益率、美国10年期TIPS实际利率、美国广义美元指数、美国CPI同比、美国核心PCE同比、美国非农就业人数、美国失业率、美国ISM制造业PMI的最新数据
+数据频率组数: 3
+
+各频率数据统计:
+  - monthly: 12 行
+  - yearly: 2 行
+  - daily: 3 行
+
+生成的文件:
+  - mx_macro_data_9cda357d_monthly.csv
+  - mx_macro_data_9cda357d_yearly.csv
+  - mx_macro_data_9cda357d_daily.csv
+
+详细说明:
+实体名称 [monthly]: CPI（月）
+标题 [monthly]: 2025-12至2026-05的CPI（月）
+单位 [monthly]: (%)
+实体名称 [monthly]: 宏观数据（月）
+标题 [monthly]: 2025-12至2026-05的宏观数据（月）
+实体名称 [yearly]: 宏观数据（年）
+标题 [yearly]: 2022至2025的宏观数据（年）
+单位 [yearly]: (%)
+实体名称 [daily]: 利率（日）
+标题 [daily]: 2026-06-01至2026-06-26的利率（日）
+单位 [daily]: (%)
+
+数据源信息:
+接口: https://ai-saas.eastmoney.com/proxy/b/mcp/tool/searchMacroData
+查询时间: 2026-06-29 14:37:05

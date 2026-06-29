@@ -1,0 +1,176 @@
+{
+  "analysisDate": "2026-06-29",
+  "latestDataDate": "2026-06-26",
+  "stageTitle": "当前阶段判断",
+  "stageConclusion": "截至2026-06-29，贵金属更接近“高利率约束下的牛市中段调整/高位震荡”，而不是单纯的降息交易或趋势彻底破坏。短期主导变量已从降息预期转向通胀、实际利率、美元和加息预期再定价；中长期仍由央行购金、美元信用和财政债务约束托底。",
+  "stageCallout": "当前判断：高利率约束下的牛市中段调整/高位震荡。若实际利率继续上行、ETF继续流出且金银跌破关键平台，则阶段可能滑向趋势破坏初期；若通胀回落、美元走弱、ETF回补，则更像牛市中段的拥挤释放后修复。",
+  "riskScore": 66,
+  "dataFiles": {
+    "mxMacroDaily": "output/mx_macro_data/mx_macro_data_9cda357d_daily.csv",
+    "mxMacroMonthly": "output/mx_macro_data/mx_macro_data_9cda357d_monthly.csv",
+    "mxMacroDescription": "output/mx_macro_data/mx_macro_data_9cda357d_description.txt",
+    "mxFinanceSearch": "miaoxiang/mx_finance_search/mx_finance_search_d9d7a80d.txt"
+  },
+  "dataNotes": [
+    "mx-macro-data已成功返回美国10Y名义利率、10Y TIPS实际利率、CPI、核心PCE、非农、失业率和ISM PMI等真实数据。",
+    "mx-finance-search已成功返回2026-06-29及附近日期的贵金属研报与资讯。",
+    "mx-finance-data查询COMEX/伦敦贵金属与GLD/SLV时返回dataTableDTOList为空；本次行情价格采用官方/可信公开源与mx-finance-search研报数据交叉。"
+  ],
+  "indicators": [
+    {
+      "name": "Fed政策利率",
+      "value": "3.50%-3.75%",
+      "date": "2026-06-17",
+      "source": "Federal Reserve FOMC statement",
+      "goldImplication": "并非简单降息交易；政策维持高位且口径偏鹰，压制黄金估值弹性。",
+      "riskImpact": "高"
+    },
+    {
+      "name": "美国10Y国债收益率",
+      "value": "4.38%",
+      "date": "2026-06-26",
+      "source": "mx-macro-data / FRED DGS10交叉",
+      "goldImplication": "名义利率仍处高位，持有黄金的机会成本未明显缓解。",
+      "riskImpact": "中高"
+    },
+    {
+      "name": "美国10Y TIPS实际利率",
+      "value": "2.18%",
+      "date": "2026-06-26",
+      "source": "mx-macro-data / FRED DFII10交叉",
+      "goldImplication": "实际利率仍高，对金价形成直接估值压力。",
+      "riskImpact": "高"
+    },
+    {
+      "name": "美国CPI同比",
+      "value": "4.167%",
+      "date": "2026-05",
+      "source": "mx-macro-data",
+      "goldImplication": "通胀重新抬升，使降息逻辑弱化并保留加息预期扰动。",
+      "riskImpact": "中高"
+    },
+    {
+      "name": "美国核心PCE同比",
+      "value": "3.4%",
+      "date": "2026-05",
+      "source": "mx-macro-data",
+      "goldImplication": "核心通胀高于目标，降低短期政策转鸽概率。",
+      "riskImpact": "中高"
+    },
+    {
+      "name": "美国失业率",
+      "value": "4.3%",
+      "date": "2026-05",
+      "source": "mx-macro-data",
+      "goldImplication": "就业未明显失速，衰退式宽松交易证据不足。",
+      "riskImpact": "中"
+    },
+    {
+      "name": "美国ISM制造业PMI",
+      "value": "54.0",
+      "date": "2026-05",
+      "source": "mx-macro-data",
+      "goldImplication": "制造业景气改善对白银工业需求有支撑，但也削弱快速降息叙事。",
+      "riskImpact": "中"
+    },
+    {
+      "name": "伦敦现货黄金",
+      "value": "4072.05美元/盎司，近两周-2.72%",
+      "date": "2026-06-26",
+      "source": "mx-finance-search: 国新证券股份贵金属双周报",
+      "goldImplication": "价格从高位回撤，当前更像拥挤释放/高位震荡而非趋势加速。",
+      "riskImpact": "中高"
+    },
+    {
+      "name": "伦敦现货白银",
+      "value": "58.38美元/盎司，近两周-12.90%",
+      "date": "2026-06-26",
+      "source": "mx-finance-search: 国新证券股份贵金属双周报",
+      "goldImplication": "白银跌幅显著大于黄金，说明工业beta和杠杆资金正在放大波动。",
+      "riskImpact": "高"
+    },
+    {
+      "name": "GLD/SPDR黄金ETF持仓",
+      "value": "约1005吨，周降15.4吨",
+      "date": "2026-06-26",
+      "source": "mx-finance-search: 广发期货贵金属周报",
+      "goldImplication": "ETF继续流出，配置盘尚未确认重新入场。",
+      "riskImpact": "高"
+    },
+    {
+      "name": "CFTC COMEX黄金非商业净多",
+      "value": "181339张",
+      "date": "2026-06-23",
+      "source": "CFTC Commitments of Traders",
+      "goldImplication": "非商业净多仍高但多空双增，资金分歧放大。",
+      "riskImpact": "中高"
+    },
+    {
+      "name": "全球央行购金",
+      "value": "2026Q1净购金244吨；多篇6月研报继续强调央行购金趋势",
+      "date": "2026-06",
+      "source": "mx-finance-search / WGC相关研报引用",
+      "goldImplication": "中长期托底仍在，短期调整不等于黄金长期逻辑失效。",
+      "riskImpact": "降低"
+    }
+  ],
+  "signals": [
+    {
+      "name": "高利率约束",
+      "strength": 86,
+      "evidence": "Fed维持3.50%-3.75%，10Y名义利率4.38%、10Y实际利率2.18%，机会成本仍高。"
+    },
+    {
+      "name": "通胀/加息预期扰动",
+      "strength": 78,
+      "evidence": "5月CPI同比4.167%、核心PCE同比3.4%，6月研报集中讨论偏鹰FOMC与加息预期。"
+    },
+    {
+      "name": "牛市中段调整",
+      "strength": 74,
+      "evidence": "伦敦金近两周回落至4072.05美元/盎司，白银跌幅更深；但央行购金、债务和美元信用逻辑仍支撑中长期。"
+    },
+    {
+      "name": "资金拥挤释放",
+      "strength": 68,
+      "evidence": "SPDR黄金ETF周降15.4吨，CFTC黄金非商业净多仍高且多空双增，说明趋势资金尚未完成重新确认。"
+    }
+  ],
+  "sources": [
+    {
+      "name": "Federal Reserve FOMC statement",
+      "url": "https://www.federalreserve.gov/newsevents/pressreleases/monetary20260617a.htm",
+      "note": "2026-06-17政策利率与FOMC表述"
+    },
+    {
+      "name": "FRED DGS10",
+      "url": "https://fred.stlouisfed.org/series/DGS10",
+      "note": "美国10Y名义国债收益率交叉验证"
+    },
+    {
+      "name": "FRED DFII10",
+      "url": "https://fred.stlouisfed.org/series/DFII10",
+      "note": "美国10Y TIPS实际利率交叉验证"
+    },
+    {
+      "name": "FRED DTWEXBGS",
+      "url": "https://fred.stlouisfed.org/series/DTWEXBGS",
+      "note": "广义美元指数观察"
+    },
+    {
+      "name": "CFTC CMX Futures Only COT",
+      "url": "https://www.cftc.gov/dea/futures/deacmxsf.htm",
+      "note": "COMEX黄金、白银非商业持仓"
+    },
+    {
+      "name": "World Gold Council gold ETF holdings and flows",
+      "url": "https://www.gold.org/goldhub/data/gold-etfs-holdings-and-flows",
+      "note": "黄金ETF资金流参考"
+    },
+    {
+      "name": "World Gold Council central bank gold reserves survey 2026",
+      "url": "https://www.gold.org/goldhub/research/central-bank-gold-reserves-survey-2026",
+      "note": "央行购金中长期趋势参考"
+    }
+  ]
+}

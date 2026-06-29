@@ -391,6 +391,8 @@ button:disabled {
 .crashGrid article,
 .signalBands article,
 .stageGrid article,
+.headlineIndicators article,
+.indicatorGrid article,
 .strategyGrid article,
 .chartBox,
 .sourceFold {
@@ -619,6 +621,98 @@ button:disabled {
 
 .stageGrid {
   grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.stageHeroGrid {
+  display: grid;
+  grid-template-columns: minmax(340px, 0.9fr) minmax(0, 1.1fr);
+  gap: 16px;
+  align-items: stretch;
+}
+
+.headlineIndicators {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.headlineIndicators article {
+  min-height: 104px;
+  padding: 18px;
+}
+
+.headlineIndicators span,
+.indicatorGrid header span {
+  display: block;
+  color: var(--muted);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12px;
+}
+
+.headlineIndicators strong {
+  display: block;
+  margin: 10px 0 8px;
+  color: var(--gold-2);
+  font-size: clamp(1.25rem, 1.8vw, 2rem);
+  line-height: 1.12;
+}
+
+.headlineIndicators small {
+  color: #d8cebe;
+  line-height: 1.35;
+}
+
+.indicatorGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.indicatorGrid article {
+  display: grid;
+  min-height: 210px;
+  padding: 18px;
+  gap: 12px;
+}
+
+.indicatorGrid header,
+.indicatorGrid footer {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.indicatorGrid header small,
+.indicatorGrid footer small {
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.3;
+  text-align: right;
+}
+
+.indicatorGrid strong {
+  color: var(--gold-2);
+  font-size: clamp(1.1rem, 1.45vw, 1.55rem);
+  line-height: 1.18;
+}
+
+.indicatorGrid p {
+  margin: 0;
+  color: #d8cebe;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.indicatorGrid footer span {
+  flex: 0 0 auto;
+  border: 1px solid rgba(217, 179, 95, 0.28);
+  border-radius: 999px;
+  padding: 5px 8px;
+  color: var(--gold-2);
+  background: rgba(217, 179, 95, 0.08);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px;
 }
 
 .stageGrid article {
@@ -851,7 +945,8 @@ button:disabled {
 
   .coverGrid,
   .twoColumn,
-  .wideLeft {
+  .wideLeft,
+  .stageHeroGrid {
     grid-template-columns: 1fr;
   }
 
@@ -862,6 +957,8 @@ button:disabled {
   .conclusionGrid,
   .frameworkCards,
   .signalBands,
+  .headlineIndicators,
+  .indicatorGrid,
   .stageGrid,
   .strategyGrid,
   .appendixGrid,
@@ -890,6 +987,8 @@ button:disabled {
   .conclusionGrid,
   .frameworkCards,
   .signalBands,
+  .headlineIndicators,
+  .indicatorGrid,
   .stageGrid,
   .strategyGrid,
   .appendixGrid,

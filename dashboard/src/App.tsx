@@ -41,6 +41,14 @@ type CrashCase = {
 };
 type RiskWeight = { signal: string; weight: number; layer: string };
 type StageSignal = { name: string; strength: number; evidence: string };
+type CurrentIndicator = {
+  name: string;
+  value: string;
+  date: string;
+  source: string;
+  implication: string;
+  riskImpact: string;
+};
 type StrategyCard = { asset: string; position: string; logic: string; useWhen: string; exitWhen: string };
 
 type DashboardData = {
@@ -51,6 +59,8 @@ type DashboardData = {
     coreCount: number;
     coreShare: number;
     latestDate: string;
+    currentLatestDataDate: string;
+    localLatestDate: string;
   };
   narrative: {
     thesis: string;
@@ -64,6 +74,8 @@ type DashboardData = {
     historicalCrashes: CrashCase[];
     riskScoreWeights: RiskWeight[];
     currentStageSignals: StageSignal[];
+    currentIndicators: CurrentIndicator[];
+    currentHeadlineIndicators: CurrentIndicator[];
     strategyCards: StrategyCard[];
     coverageStats: {
       layers: NamedValue[];
@@ -77,6 +89,8 @@ type DashboardData = {
         pages: number;
         chars: number;
         latestDate: string;
+        currentAnalysisDate: string;
+        currentLatestDataDate: string;
         coreShare: number;
       };
     };
@@ -446,7 +460,7 @@ function App() {
       "降息周期",
       "历史大调整",
       "大回撤预警",
-      "样本阶段",
+      "当前阶段判断",
       "策略",
       "数据附录"
     ],
@@ -487,8 +501,9 @@ function App() {
   }
 
   const p = data.presentation;
-  const sampleDrawdownRisk =
-    p.currentStageSignals.find((item) => item.name === "样本内拥挤风险")?.strength ?? 70;
+  const currentStageRisk =
+    p.currentStageSignals.find((item) => item.name.includes("资金") || item.name.includes("风险"))?.strength ??
+    Math.round(p.currentStageSignals.reduce((sum, item) => sum + item.strength, 0) / Math.max(1, p.currentStageSignals.length));
 
   const slideProps = {
     initial: reduced ? false : { opacity: 0, y: 28, filter: "blur(8px)" },
@@ -541,9 +556,9 @@ function App() {
                   <small>页研报文本</small>
                 </div>
                 <div className="coverMetric third">
-                  <span>样本边界</span>
+                  <span>当前判断</span>
                   <strong>{data.summary.latestDate}</strong>
-                  <small>不含实时行情</small>
+                  <small>数据至 {data.summary.currentLatestDataDate}</small>
                 </div>
               </div>
               <SourceFold sources={p.sourcesByPage.conclusion} />
@@ -690,10 +705,37 @@ function App() {
 
           {page === 7 && (
             <div className="slideStack">
-              <SlideHeader title="样本阶段推断" subtitle="仅基于截至 2026-03-03 的本地研报样本，不代表 2026-06-29 实时市场状态。" />
-              <ChartBox title="样本内拥挤风险提示" icon={<Gauge size={20} weight="duotone" />}>
-                <ReactECharts option={riskGaugeOption(sampleDrawdownRisk)} style={{ height: 360 }} />
-              </ChartBox>
+              <SlideHeader title="当前阶段判断" subtitle={data.narrative.boundary} />
+              <div className="stageHeroGrid">
+                <ChartBox title="当前中高风险提示" icon={<Gauge size={20} weight="duotone" />}>
+                  <ReactECharts option={riskGaugeOption(currentStageRisk)} style={{ height: 320 }} />
+                </ChartBox>
+                <div className="headlineIndicators">
+                  {p.currentHeadlineIndicators.map((item) => (
+                    <article key={item.name}>
+                      <span>{item.name}</span>
+                      <strong>{item.value}</strong>
+                      <small>{item.date} / {item.riskImpact}</small>
+                    </article>
+                  ))}
+                </div>
+              </div>
+              <div className="indicatorGrid">
+                {p.currentIndicators.map((item) => (
+                  <article key={item.name}>
+                    <header>
+                      <span>{item.name}</span>
+                      <small>{item.date}</small>
+                    </header>
+                    <strong>{item.value}</strong>
+                    <p>{item.implication}</p>
+                    <footer>
+                      <span>{item.riskImpact}</span>
+                      <small>{item.source}</small>
+                    </footer>
+                  </article>
+                ))}
+              </div>
               <div className="stageGrid">
                 {p.currentStageSignals.map((signal) => (
                   <article key={signal.name}>
@@ -706,7 +748,7 @@ function App() {
               </div>
               <div className="stageCallout">
                 <h3>归纳判断</h3>
-                <p>样本内更接近降息预期交易期 + 高利率维持后段 + 贵金属牛市中段，局部带有大调整前期风险。实时判断需要补充今天的数据。</p>
+                <p>{p.onePageConclusions.find((item) => item.question === "当前阶段？")?.answer}</p>
               </div>
               <SourceFold sources={p.sourcesByPage.stage} />
             </div>

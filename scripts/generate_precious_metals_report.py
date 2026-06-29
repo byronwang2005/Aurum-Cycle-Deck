@@ -29,6 +29,7 @@ from typing import Iterable
 ROOT = Path(__file__).resolve().parents[1]
 JSON_DIR = ROOT / "json"
 OUT_DIR = ROOT / "output"
+CURRENT_MARKET_PATH = OUT_DIR / "current_market_snapshot.json"
 
 
 FACTOR_KEYWORDS = {
@@ -421,6 +422,53 @@ def table(rows: list[list[str]]) -> str:
     return "\n".join(out)
 
 
+def load_current_market_snapshot() -> dict:
+    if CURRENT_MARKET_PATH.exists():
+        with CURRENT_MARKET_PATH.open("r", encoding="utf-8") as f:
+            return json.load(f)
+    return {
+        "analysisDate": "2026-06-29",
+        "latestDataDate": "2026-06-26",
+        "stageConclusion": "当前市场快照缺失，暂沿用本地研报样本判断。",
+        "stageCallout": "需补充 output/current_market_snapshot.json 后更新实时判断。",
+        "riskScore": 70,
+        "indicators": [],
+        "signals": [],
+        "sources": [],
+        "dataNotes": ["未找到 current_market_snapshot.json。"],
+    }
+
+
+def current_indicator_table(snapshot: dict) -> str:
+    rows = [["指标", "最新值", "日期", "来源", "对黄金含义", "风险评分影响"]]
+    for item in snapshot.get("indicators", []):
+        rows.append([
+            str(item.get("name", "")),
+            str(item.get("value", "")),
+            str(item.get("date", "")),
+            str(item.get("source", "")),
+            str(item.get("goldImplication", "")),
+            str(item.get("riskImpact", "")),
+        ])
+    return table(rows)
+
+
+def current_signal_bullets(snapshot: dict) -> str:
+    lines = []
+    for item in snapshot.get("signals", []):
+        lines.append(f"- {item.get('name', '')}（强度 {item.get('strength', '')}/100）：{item.get('evidence', '')}")
+    return "\n".join(lines)
+
+
+def current_source_bullets(snapshot: dict) -> str:
+    lines = []
+    for item in snapshot.get("sources", []):
+        lines.append(f"- {item.get('name', '')}：{item.get('url', '')}。{item.get('note', '')}")
+    for note in snapshot.get("dataNotes", []):
+        lines.append(f"- 数据说明：{note}")
+    return "\n".join(lines)
+
+
 def write_report(docs: list[ReportDoc], evidence: dict[str, list[dict]]) -> None:
     layer_counter = Counter(d.layer for d in docs)
     total_pages = sum(d.page_count for d in docs)
@@ -433,12 +481,21 @@ def write_report(docs: list[ReportDoc], evidence: dict[str, list[dict]]) -> None
     source_silver = "；".join(first_evidence(evidence, "白银定价框架", 5))
     source_pgm = "；".join(first_evidence(evidence, "铂钯框架", 4))
     source_current = "；".join(first_evidence(evidence, "当前阶段", 5))
+    current_market = load_current_market_snapshot()
+    current_indicators = current_indicator_table(current_market)
+    current_signals = current_signal_bullets(current_market)
+    current_sources = current_source_bullets(current_market)
+    current_analysis_date = current_market.get("analysisDate", "2026-06-29")
+    current_latest_data_date = current_market.get("latestDataDate", "2026-06-26")
+    current_stage_conclusion = current_market.get("stageConclusion", "")
+    current_stage_callout = current_market.get("stageCallout", "")
+    current_risk_score = current_market.get("riskScore", "")
 
     report = f"""# 贵金属宏观策略研究报告
 
-> 信息边界：本报告仅使用本地研报资料库 `/Users/macbook/Desktop/研报/json`，未调用外部网页、实时行情、金融数据库或 2026-03-03 之后数据。所谓“当前市场映射”指本地研报样本截至最新报告日 {latest_date} 的阶段判断，不等同于 2026-06-29 的实时市场判断。
+> 信息边界：第 1-7 节和第 9-13 节主要使用本地研报资料库 `/Users/macbook/Desktop/研报/json` 与已生成证据索引；第 8 节使用 `output/current_market_snapshot.json`、`output/current_market_sources.md`、mx skills 真实数据和官方可信网页交叉验证。当前判断截至 {current_analysis_date}，数据最新可得日至 {current_latest_data_date}。
 
-> 使用的 Skill 和工具：使用 `pdf` Skill 处理 PDF 转换后的结构化 JSON；使用 `find`/`rg` 思路清点文件与筛选主题；使用 `python3` 批量解析 `/Users/macbook/Desktop/研报/json/*.json` 和 `manifest.jsonl`，生成观点库、证据索引和本报告。未使用外部数据源。
+> 使用的 Skill 和工具：使用 `pdf` Skill 处理 PDF 转换后的结构化 JSON；使用 `mx-macro-data` 查询宏观真实数据；使用 `mx-finance-search` 查询最新贵金属资讯和研报；尝试使用 `mx-finance-data` 查询贵金属和 ETF 行情但接口返回空表，行情价格改用可信网页和 mx 资讯交叉。使用 `python3` 批量解析研报与当前快照，生成观点库、证据索引和本报告。
 
 ## 1. 执行摘要 Executive Summary
 
@@ -601,14 +658,23 @@ def write_report(docs: list[ReportDoc], evidence: dict[str, list[dict]]) -> None
 
 ## 8. 当前市场所处阶段判断
 
-基于本地研报样本截至 {latest_date}，市场更接近“降息预期交易期 + 高利率维持后段 + 贵金属牛市中段，局部带有大调整前期风险”的组合，而不是单一阶段。依据如下：
+本节判断截至 {current_analysis_date}，数据最新可得日至 {current_latest_data_date}。{current_stage_conclusion}
 
-- 多篇 2025-2026 年研报继续强调黄金中长期逻辑未变，包括央行购金、美元信用、债务财政、地缘风险和战略配置需求。
-- 同时，2025 年 10 月后的报告已经开始讨论金银大跌、交易拥挤、波动率高位和黄金配置性价比下降，说明牛市中段并不排除深度回撤。
-- 2026 年初多份期货周报提到黄金、白银、铂等价格创新高或高位震荡，且白银表现分化，符合“主趋势仍强但波动放大”的环境。
-- 因不使用 2026-03-03 之后外部数据，本报告不判断 2026-06-29 实时阶段。
+当前风险评分约为 {current_risk_score}/100，属于中高风险区间。核心不是“黄金长期逻辑失效”，而是高实际利率、通胀黏性、ETF流出和白银高 beta 回撤共同压制短期收益风险比。
 
-证据来源：{source_current}。
+{current_indicators}
+
+阶段信号：
+
+{current_signals}
+
+归纳判断：{current_stage_callout}
+
+本地研报框架证据仍用于解释周期位置：{source_current}。
+
+当前数据来源：
+
+{current_sources}
 
 ## 9. 黄金策略
 
@@ -635,7 +701,7 @@ def write_report(docs: list[ReportDoc], evidence: dict[str, list[dict]]) -> None
 
 ## 12. 风险提示
 
-本报告的最大限制是信息边界：只使用本地研报，不补充实时数据，因此当前阶段判断只反映样本截至 {latest_date} 的研报结论。研报本身可能存在滞后、机构偏见或事后解释。对于 2026-03-03 之后的实际行情、Fed 定价、DXY、实际利率、ETF 和 CFTC 变化，本报告未纳入。
+本报告的主要限制是数据口径差异：历史框架来自本地研报库，当前阶段来自 mx skills、官方网页和可信资讯交叉；不同数据源在收盘价、发布时间、ETF统计口径和期货持仓分类上可能存在差异。`mx-finance-data` 本次未返回行情结构化表，因此贵金属价格和ETF持仓采用可信网页与 `mx-finance-search` 结果交叉。
 
 交易风险包括：实际利率超预期上行、美元指数突破、通胀和就业数据强于预期、Fed 降息预期后移、流动性危机中的被动抛售、ETF/CFTC/期权拥挤踩踏、白银工业需求不及预期、铂钯产业替代和供需数据变化。
 
@@ -649,7 +715,7 @@ def write_report(docs: list[ReportDoc], evidence: dict[str, list[dict]]) -> None
 ["加息一定利空吗？", "不一定。真正利空是实际利率和美元快速上行且流动性收缩；加息尾声反而可能提前见底。"],
 ["降息一定利多吗？", "不一定。预防式降息偏利多，衰退/危机式降息可能先跌后涨，通胀回落过快会削弱实际利率下行。"],
 ["如何避开大回撤？", "盯实际利率、DXY、美债、Fed 预期、通胀就业、ETF/CFTC、金银比、技术破位和叙事拥挤的组合信号。"],
-["当前样本阶段？", "截至本地研报最新日期，更像降息预期交易期 + 高利率维持后段 + 牛市中段，同时存在拥挤回撤风险。"],
+["当前阶段？", "{current_stage_callout}"],
 ])}
 
 ## 可迭代分析模板
